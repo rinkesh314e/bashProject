@@ -1,0 +1,17 @@
+#!/bin/bash
+#BASH script to read a file given as an input where each line in the file contains a utility. Print the version of the utility, if it is installed, else print the statement 'The utility <name> is not installed'
+
+for pckg in $(cat $1);
+do
+	$pckg --version > /dev/null
+	if [[ $? -eq 0 ]]
+	then 
+		echo "$pckg ==>"   $pckg --version
+		echo "---------------------------------------------------------------"
+	else 
+		echo $pckg not installed
+		echo "---------------------------------------------------------------"
+	fi
+done
+
+exit 0

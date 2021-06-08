@@ -1,0 +1,10 @@
+#!/bin/bash
+#this script is used to get all muounts and there names
+#./fileSysType
+
+df -aHT
+
+exit 0
+
+
+

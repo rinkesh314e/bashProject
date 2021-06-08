@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#this script is used to get the current file system name
+#./7
+
+df -HT ./ | awk '{print $1}'
+
+exit 0
+
+
+
+

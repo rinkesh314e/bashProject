@@ -1,0 +1,162 @@
+#!/bin/bash	
+
+#script which will mount folder(s) as different users
+
+#Asume following directory structure:
+#/data/courses — This is the folder where there are list of course files available
+#/home/trainee – This is the home folder of trainee where we need to mount folders
+#Assume a user: username:trainee group:ftpaccess
+
+
+#/data/courses/
+#├── Linux_course
+#│   ├── Linux_course1
+#│   └── Linux_course2
+#├── machinelearning
+#│   ├── machinelearning1
+#│   └── machinelearning2
+#├── SQLFundamentals1
+#├── SQLFundamentals2
+#└── SQLFundamentals3
+
+#./course_mount.sh -h
+#Usage:
+#    ./course_mount.sh -h To print this help message
+#    ./course_mount.sh -m -c [course] For mounting a given course
+#    ./course_mount.sh -u -c [course] For unmounting a given course
+#If course name is ommited all courses will be (un)mounted
+
+#Usage of bindfs:
+#bindfs -p a-w -u trainee -g ftpaccess ${COURSE_PATH} ${TARGET_PATH}
+
+
+
+# Create an array which holds list of courses. This should be used to compare if the course name is passed in CLI
+COURSES=(
+"Linux_course/Linux_course1"
+"Linux_course/Linux_course2"
+"machineLearning/machineLearning1"
+"machineLearning/machineLearning2"
+"SQLFundamentals1"
+"SQLFundamentals2"
+"SQLFundamentals3"
+)
+
+
+
+# function for usage
+usage() {
+	if [[ $1 == "-h" ]] 
+	then 
+		cat <<-ENDHELP
+		Usage:
+		    ./course_mount.sh -h To print this help message
+		    ./course_mount.sh -m -c [course] For mounting a given course
+		    ./course_mount.sh -u -c [course] For unmounting a given course
+		If course name is ommited all courses will be (un)mounted
+		ENDHELP
+	elif [[ $1 == "-m" ]]
+	then
+		if [[ $2 == "-c" ]]
+		then
+			mount_course $3
+		else
+			mount_all
+		fi
+	elif [[ $1 == "-u" ]]
+	then
+		if [[ $2 == "-c" ]]
+		then
+			unmount_course $3
+		else
+			unmount_all
+		fi
+	else
+		echo "Improper input"
+	fi
+
+}
+
+
+#function for mount a course
+mount_course() {
+    # Check if the given course exists in course array
+	CHECK=0
+	for CRS in ${COURSES[@]}
+	do
+		if [[ $CRS==$1 ]] 
+		then 
+			CHECK=1
+			break
+		fi	
+	done
+	if [[ $CHECK==1 ]]
+	then 
+		echo "Mounting $1"
+	else	
+		echo "Course Not Present"
+	fi
+
+    # Check if the mount is already exists
+	bindfs -p a-w -o nonempty -u trainee -g ftpaccess /data/courses/$1 /home/trainee/courses/$1 2>/dev/null
+	ES=$(echo $?)
+	if [[ $ES == 0 ]]
+	then 
+		echo "Course ALready mounted"
+		exit 0
+	else 
+		echo "Mounting......."
+	fi
+
+    # Create directory in target
+	mkdir -pv /home/trainee/courses/$1
+    # Set permissions
+    # Mount the source to target
+	bindfs -p a-w -o nonempty -u trainee -g ftpaccess /data/courses/$1 /home/trainee/courses/$1
+	echo "mounted Successfully"
+
+}
+
+# function to mount all courses
+mount_all(){
+	mkdir /home/trainee/courses 2>/dev/null
+	bindfs -p a-w -o nonempty -u trainee -g ftpaccess /data/courses/ /home/trainee/courses/
+
+}
+
+# function for unmount course
+unmount_course() {
+    # Check if mount exists
+	#bindfs -p a-w -o nonempty -u trainee -g ftpaccess /data/courses/$1 /home/trainee/courses/$1
+	umount /home/trainee/courses/$1 2>/dev/null
+	ES=$(echo $?)
+	if [[ $ES==0 ]]
+	then
+		echo "Unmounted Successfully"
+		rm -r /home/trainee/courses/$1 2>/dev/null
+	else
+		echo "Course Already Unmounted"
+	fi
+}
+
+# function for unmount all courses
+unmount_all() {
+    # Loop through courses array
+    # call unmount_course
+	umount /home/trainee/courses/ 2>/dev/null
+	ES=$(echo $?)
+	if [[ $ES==0 ]]
+	then 
+		echo All Courses Unmounted Successfully
+	else
+		echo The Directory is already unmounted
+	fi
+
+}
+
+
+
+#calling the main function
+usage $1 $2 $3
+
+exit 0

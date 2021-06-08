@@ -1,0 +1,14 @@
+#!/bin/bash
+#BASH script to print dates from today till end of the month
+
+CNT=0
+
+while [[ true ]]
+do 
+	if [[ $(date -d "+$CNT day" +%m) -eq $(date -d "+1 month" +%m) ]]
+	then 
+		exit 0
+	fi
+	echo $(date -d "+$CNT day" +%d-%m-%y)
+	CNT=$(($CNT + 1))
+done 

@@ -1,0 +1,14 @@
+1. Public IP: 	27.63.41.141 (curl ifcofig.co)
+
+2. List of SSIDs: iw wlsp30 scan | grep SSID
+
+3. password of SSID: sudo cat /etc/NetworkManager/system-connections/hellford21
+
+4. delete old SSID : sudo rm -i /etc/NetworkManager/system-connections/ruchishivani
+
+6. 
+	all ip addresses: awk '{print $1}' access.log
+	all ip addresses count: awk '{print $1}' access.log | wc -l
+	unique ip addresses: awk '{print $1} ' access.log | uniq
+	unique ip addresses count: awk '{print $1} ' access.log | uniq | wc -l
+	sorted uniques ip addresses: awk '{print $1}' access.log | sort | uniq

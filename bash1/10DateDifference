@@ -1,0 +1,11 @@
+#!/bin/bash
+#echo difference in dates between given to date inputs
+echo Enter date1 in yyyy-mm-dd format
+read d1
+echo Enter date2 in yyyy-mm-dd format
+read d2
+
+let d=($(date -d $d1 +%s)-$(date -d $d2  +%s))/86400
+echo $d
+
+exit 0

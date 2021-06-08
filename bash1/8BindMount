@@ -1,0 +1,13 @@
+#!/bin/bash
+#Write a BASH script to create a bind mount of one directory into another.
+echo enter src dir
+read SRC
+echo enter dest dir
+read DEST
+
+sudo mount --bind $SRC $DEST
+echo bind mount done
+
+exit 0
+
+
